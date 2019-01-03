@@ -4,6 +4,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.hankcs.hanlp.HanLP;
+import com.hankcs.hanlp.seg.common.Term;
 import org.apdplat.word.WordSegmenter;
 import org.apdplat.word.segmentation.Word;
 import org.slf4j.Logger;
@@ -14,9 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,7 +43,7 @@ public class ProcessDataFactory {
         BiMap<Integer,String> categoryMap = HashBiMap.create();
         DoubleArrayTrie dic = new DoubleArrayTrie();
         AtomicInteger categoryMapIDGenerator = preprocessedDataSet.getCategoryMapIDGenerator();
-        List<String> list = new ArrayList<>();
+        Set<String> dicSet = new HashSet<>();
         for (File folder : folders) {
             if (folder.isFile()) continue;
             File[] files = folder.listFiles();
@@ -60,18 +60,37 @@ public class ProcessDataFactory {
                 List<Word> words = WordSegmenter.seg(fileContent);
                 Multiset<String> letterCountNultiset = HashMultiset.create();
                 if(!CollectionUtils.isEmpty(words)) {
+                    System.out.printf("word    ");
                     for(Word word : words) {
+//                        System.out.printf(word.getText()+" ");
                         String wordStr = word.getText();
                         letterCountNultiset.add(wordStr);
-                        list.add(wordStr);
+                        dicSet.add(wordStr);
                     }
                 }
+//                System.out.println();
+//
+//
+//
+//                List<Term> termList = HanLP.segment(fileContent);
+//                if(!CollectionUtils.isEmpty(termList)) {
+//                    System.out.printf("hanlp    ");
+//                    for(Term term : termList) {
+//                        System.out.printf(term.word+" ");
+//                    }
+//                }
+//                System.out.println();
+
+
+
+
                 docModel.setLetterCountNultiset(letterCountNultiset);
                 docModels.add(docModel);
             }
         }
         preprocessedDataSet.setCategoryMap(categoryMap);
         preprocessedDataSet.setDocModels(docModels);
+        List<String> list = new ArrayList<>(dicSet);
         Collections.sort(list);
         dic.build(list);
         preprocessedDataSet.setDic(dic);

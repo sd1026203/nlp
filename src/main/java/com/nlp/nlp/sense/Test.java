@@ -1,27 +1,16 @@
 package com.nlp.nlp.sense;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.nlp.nlp.DemoSentimentAnalysis;
-import org.apdplat.word.WordSegmenter;
-import org.apdplat.word.dictionary.DictionaryFactory;
-import org.apdplat.word.segmentation.Word;
-import org.apdplat.word.util.WordConfTools;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.hankcs.hanlp.classification.utilities.io.ConsoleLogger.logger;
 
 /**
  * @Author 葛伟 gewei01@58ganji.com
