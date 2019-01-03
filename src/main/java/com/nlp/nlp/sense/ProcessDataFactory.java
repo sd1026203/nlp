@@ -58,13 +58,13 @@ public class ProcessDataFactory {
                 DocModel docModel = new DocModel();
                 docModel.setCategory(categoryName);
                 List<Word> words = WordSegmenter.seg(fileContent);
-                Multiset<String> letterCountNultiset = HashMultiset.create();
+                Multiset<String> letterCountMultiset = HashMultiset.create();
                 if(!CollectionUtils.isEmpty(words)) {
                     System.out.printf("word    ");
                     for(Word word : words) {
 //                        System.out.printf(word.getText()+" ");
                         String wordStr = word.getText();
-                        letterCountNultiset.add(wordStr);
+                        letterCountMultiset.add(wordStr);
                         dicSet.add(wordStr);
                     }
                 }
@@ -84,7 +84,7 @@ public class ProcessDataFactory {
 
 
 
-                docModel.setLetterCountNultiset(letterCountNultiset);
+                docModel.setLetterCountNultiset(letterCountMultiset);
                 docModels.add(docModel);
             }
         }
