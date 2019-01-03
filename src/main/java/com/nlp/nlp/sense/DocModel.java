@@ -3,9 +3,6 @@ package com.nlp.nlp.sense;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 统计文档的类型以及词频
  * @Author 葛伟 gewei01@58ganji.com
@@ -13,7 +10,12 @@ import java.util.List;
  */
 public class DocModel {
     private String category;
-    private Multiset<String> letterCountNultiset = HashMultiset.create();
+
+    public void setLetterCountNultiset(Multiset<String> letterCountNultiset) {
+        this.letterCountNultiset = letterCountNultiset;
+    }
+
+    private Multiset<String> letterCountNultiset;
 
     public String getCategory() {
         return category;
