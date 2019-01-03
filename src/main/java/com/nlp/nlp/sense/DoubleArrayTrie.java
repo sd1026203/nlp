@@ -1,4 +1,4 @@
-package com.nlp.nlp;
+package com.nlp.nlp.sense;
 
 /**
  * @Author 葛伟 gewei01@58ganji.com
