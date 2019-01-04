@@ -72,8 +72,14 @@ public class BayesClassifier {
                     Long N00 = N0dot - N01;
                     //N10 是含有该特征却不属于该类目的文档数量
                     Long N10 = N1dot - N11;
-                    double chisquareScore = (N1dot + N0dot) * Math.pow(N11 * N00 - N10 * N01, 2) / ((N11 + N01) * (N11 + N10) * (N10 + N00) * (N01 + N00));
-                    System.out.println(word + "  " + category + "  " + chisquareScore + "  " + N1dot  + " " + N0dot+ " " + N11+ " " + N01+ " " + N00+ " " + N10);
+                    long l = (N11 + N01) * (N11 + N10) * (N10 + N00) * (N01 + N00);
+                    double l1 = Math.pow(N11 * N00 - N10 * N01, 2);
+                    long l3 = (N1dot + N0dot);
+                    double chisquareScore = l3 * l1 / l;
+                    if(N11 == 44 && N10 == 38) {
+                        double chisquareScore1 = (N1dot + N0dot) * Math.pow(N11 * N00 - N10 * N01, 2) / l;
+                        System.out.println(letterCountTableRowMap.size() + "  " + word + "  " + category + "  " + chisquareScore + "  " + N1dot + " " + N0dot + " " + N11 + " " + N01 + " " + N00 + " " + N10);
+                    }
 
                     if (chisquareScore > 10.83) {
                         System.out.println(word + "  " + category + "  " + chisquareScore);

@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.util.concurrent.AtomicLongMap;
 import com.hankcs.hanlp.HanLP;
+import com.hankcs.hanlp.classification.tokenizers.HanLPTokenizer;
 import com.hankcs.hanlp.seg.common.Term;
 import org.apdplat.word.WordSegmenter;
 import org.apdplat.word.segmentation.Word;
@@ -37,6 +38,7 @@ public class ProcessDataFactory {
         PreprocessedDataSet preprocessedDataSet = new PreprocessedDataSet();
         List<DocModel> docModels = new ArrayList<>();
         AtomicLongMap<String> categoryDocCountMap = AtomicLongMap.create();
+        HanLPTokenizer hanLPTokenizer = new HanLPTokenizer();
         for (File folder : folders) {
             if (folder.isFile()) continue;
             File[] files = folder.listFiles();
@@ -64,11 +66,11 @@ public class ProcessDataFactory {
 //                }
 
 
-                List<Term> termList = HanLP.segment(fileContent);
-                if(!CollectionUtils.isEmpty(termList)) {
-                    for(Term term : termList) {
-                        String wordStr = term.word;
-                        letterCountMap.put(wordStr, 1);
+                String[] words = hanLPTokenizer.segment(fileContent);
+                if(words != null && words.length > 0) {
+                    for(String word : words) {
+//                        String wordStr = term.word;
+                        letterCountMap.put(word, 1);
                     }
                 }
 
