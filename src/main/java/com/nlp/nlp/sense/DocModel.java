@@ -1,7 +1,7 @@
 package com.nlp.nlp.sense;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.google.common.util.concurrent.AtomicLongMap;
 
 /**
  * 统计文档的类型以及词频
@@ -10,12 +10,7 @@ import com.google.common.collect.Multiset;
  */
 public class DocModel {
     private String category;
-
-    public void setLetterCountNultiset(Multiset<String> letterCountNultiset) {
-        this.letterCountNultiset = letterCountNultiset;
-    }
-
-    private Multiset<String> letterCountNultiset;
+    private AtomicLongMap<String> letterCountMap;
 
     public String getCategory() {
         return category;
@@ -25,7 +20,11 @@ public class DocModel {
         this.category = category;
     }
 
-    public Multiset<String> getLetterCountNultiset() {
-        return letterCountNultiset;
+    public AtomicLongMap<String> getLetterCountMap() {
+        return letterCountMap;
+    }
+
+    public void setLetterCountMap(AtomicLongMap<String> letterCountMap) {
+        this.letterCountMap = letterCountMap;
     }
 }

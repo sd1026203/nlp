@@ -1,9 +1,8 @@
 package com.nlp.nlp.sense;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
+import com.google.common.util.concurrent.AtomicLongMap;
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.seg.common.Term;
 import org.apdplat.word.WordSegmenter;
@@ -14,10 +13,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Author 葛伟 gewei01@58ganji.com
@@ -31,7 +28,6 @@ public class ProcessDataFactory {
         if (!root.exists()) throw new IllegalArgumentException(String.format("目录 %s 不存在", root.getAbsolutePath()));
         if (!root.isDirectory())
             throw new IllegalArgumentException(String.format("目录 %s 不是一个目录", root.getAbsolutePath()));
-//        if (percentage > 1.0 || percentage < -1.0) throw new IllegalArgumentException("percentage 的绝对值必须介于[0, 1]之间");
 //
         File[] folders = root.listFiles();
         if (folders == null) {
@@ -40,10 +36,7 @@ public class ProcessDataFactory {
         }
         PreprocessedDataSet preprocessedDataSet = new PreprocessedDataSet();
         List<DocModel> docModels = new ArrayList<>();
-        BiMap<Integer,String> categoryMap = HashBiMap.create();
-        DoubleArrayTrie dic = new DoubleArrayTrie();
-        AtomicInteger categoryMapIDGenerator = preprocessedDataSet.getCategoryMapIDGenerator();
-        Set<String> dicSet = new HashSet<>();
+        AtomicLongMap<String> categoryDocCountMap = AtomicLongMap.create();
         for (File folder : folders) {
             if (folder.isFile()) continue;
             File[] files = folder.listFiles();
@@ -51,49 +44,43 @@ public class ProcessDataFactory {
                 continue;
             }
             String categoryName = folder.getName();
-            categoryMap.put(categoryMapIDGenerator.getAndIncrement(),categoryName);
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
+                if(file.getName().equals("neg.1674.txt")){
+                    System.out.println(readWholeFile(file));
+                }
                 String fileContent = readWholeFile(file);
                 DocModel docModel = new DocModel();
                 docModel.setCategory(categoryName);
-                List<Word> words = WordSegmenter.seg(fileContent);
-                Multiset<String> letterCountMultiset = HashMultiset.create();
-                if(!CollectionUtils.isEmpty(words)) {
-                    System.out.printf("word    ");
-                    for(Word word : words) {
-//                        System.out.printf(word.getText()+" ");
-                        String wordStr = word.getText();
-                        letterCountMultiset.add(wordStr);
-                        dicSet.add(wordStr);
-                    }
-                }
-//                System.out.println();
-//
-//
-//
-//                List<Term> termList = HanLP.segment(fileContent);
-//                if(!CollectionUtils.isEmpty(termList)) {
-//                    System.out.printf("hanlp    ");
-//                    for(Term term : termList) {
-//                        System.out.printf(term.word+" ");
+                AtomicLongMap<String> letterCountMap = AtomicLongMap.create();
+
+
+//                List<Word> words = WordSegmenter.seg(fileContent);
+//                if(!CollectionUtils.isEmpty(words)) {
+//                    for(Word word : words) {
+//                        String wordStr = word.getText();
+//                        letterCountMap.put(wordStr, 1);
 //                    }
 //                }
-//                System.out.println();
+
+
+                List<Term> termList = HanLP.segment(fileContent);
+                if(!CollectionUtils.isEmpty(termList)) {
+                    for(Term term : termList) {
+                        String wordStr = term.word;
+                        letterCountMap.put(wordStr, 1);
+                    }
+                }
 
 
 
-
-                docModel.setLetterCountNultiset(letterCountMultiset);
+                docModel.setLetterCountMap(letterCountMap);
                 docModels.add(docModel);
+                categoryDocCountMap.incrementAndGet(categoryName);
             }
         }
-        preprocessedDataSet.setCategoryMap(categoryMap);
+        preprocessedDataSet.setCategoryDocCountMap(categoryDocCountMap);
         preprocessedDataSet.setDocModels(docModels);
-        List<String> list = new ArrayList<>(dicSet);
-        Collections.sort(list);
-        dic.build(list);
-        preprocessedDataSet.setDic(dic);
         return preprocessedDataSet;
     }
 

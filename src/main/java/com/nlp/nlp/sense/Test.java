@@ -34,6 +34,8 @@ public class Test {
 //        LOGGER.info(""+weekNameMap.inverse().get("一"));
 //        logger.start("模式:%s\n文本编码:%s\n根目录:%s\n加载中...\n", testingDataSet ? "测试集" : "训练集", charsetName, folderPath);
         PreprocessedDataSet preprocessedDataSet = ProcessDataFactory.loadPreprocessedDataSet(DemoSentimentAnalysis.class.getClassLoader().getResource("ChnSentiCorp").getPath());
+        BayesClassifier bayesClassifier = new BayesClassifier();
+        bayesClassifier.generateBayesModel(preprocessedDataSet);
         Multiset<String> letterCountNultiset = HashMultiset.create();
         letterCountNultiset.add("中国");
         letterCountNultiset.add("中国");
