@@ -52,7 +52,6 @@ public class BayesClassifier {
                 selectedLetterCountTable.put(selectedWord, entry.getKey(), entry.getValue());
             }
         }
-        selectedLetterCountTable.put("希特勒", "正面", 300L);
         bayesModel.setSelectedLetterCountTable(selectedLetterCountTable);
         DoubleArrayTrie dic = new DoubleArrayTrie();
         dic.build(new ArrayList<>(selectedWords));
