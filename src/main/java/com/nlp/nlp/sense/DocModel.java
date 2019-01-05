@@ -9,9 +9,13 @@ import com.google.common.util.concurrent.AtomicLongMap;
  * @Date 2019/1/3 15:26
  */
 public class DocModel {
+    //所属类别
     private String category;
-    private AtomicLongMap<String> letterCountMap;
 
+    //词频, 去重, value永远是1
+    private AtomicLongMap<String> letterCountMap;
+    //词频, 不去重, value大于等于1
+    private AtomicLongMap<String> realLetterCountMap;
     public String getCategory() {
         return category;
     }
@@ -26,5 +30,13 @@ public class DocModel {
 
     public void setLetterCountMap(AtomicLongMap<String> letterCountMap) {
         this.letterCountMap = letterCountMap;
+    }
+
+    public AtomicLongMap<String> getRealLetterCountMap() {
+        return realLetterCountMap;
+    }
+
+    public void setRealLetterCountMap(AtomicLongMap<String> realLetterCountMap) {
+        this.realLetterCountMap = realLetterCountMap;
     }
 }

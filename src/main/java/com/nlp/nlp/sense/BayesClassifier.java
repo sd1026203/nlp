@@ -6,9 +6,7 @@ import com.google.common.collect.Table;
 import com.google.common.util.concurrent.AtomicLongMap;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author 葛伟 gewei01@58ganji.com
@@ -43,17 +41,59 @@ public class BayesClassifier {
 
 
 
-        chi_square(preprocessedDataSet.getCategoryDocCountMap(), letterCountTable);
-        System.out.println(letterCountTable);
+        Map<String, Double> selectedFeatures = chi_square(preprocessedDataSet.getCategoryDocCountMap(), letterCountTable);
+
+        Set<String> selectedWords = selectedFeatures.keySet();
+        Table<String,String,Long> selectedLetterCountTable = HashBasedTable.create();
+        Map<String, Map<String, Long>> letterCountTableRowMap = letterCountTable.rowMap();
+        for (String selectedWord : selectedWords) {
+            Map<String, Long> map = letterCountTableRowMap.get(selectedWord);
+            for (Map.Entry<String, Long> entry : map.entrySet()) {
+                selectedLetterCountTable.put(selectedWord, entry.getKey(), entry.getValue());
+            }
+        }
+        selectedLetterCountTable.put("希特勒", "正面", 300L);
+        bayesModel.setSelectedLetterCountTable(selectedLetterCountTable);
+        DoubleArrayTrie dic = new DoubleArrayTrie();
+        dic.build(new ArrayList<>(selectedWords));
+        bayesModel.setDic(dic);
+        bayesModel.setFeatureCount(selectedFeatures.size());
+        bayesModel.setCategoryCount(preprocessedDataSet.getCategoryDocCountMap().size());
+        bayesModel.setCategoryDocCountMap(preprocessedDataSet.getCategoryDocCountMap());
+        bayesModel.setDocCount(preprocessedDataSet.getCategoryDocCountMap().asMap().values().stream().mapToLong(value -> value).sum());
+        Set<String> categorySet = preprocessedDataSet.getCategoryDocCountMap().asMap().keySet();
+        Map<String, Double> priorLogMap = new HashMap<>();
+        for (String category : categorySet) {
+            Long value = bayesModel.getCategoryDocCountMap().get(category);
+            priorLogMap.put(category, Math.log((double) value / bayesModel.getDocCount()));
+        }
+        bayesModel.setPriorLogMap(priorLogMap);
+        //拉普拉斯平滑处理（又称加一平滑）时需要估计每个类目下的实例
+        Map<String, Long> featureOccurrencesInCategory = new HashMap<>();
+        Map<String, Map<String, Long>> map = selectedLetterCountTable.columnMap();
+        for (Map.Entry<String, Map<String, Long>> entry : map.entrySet()) {
+            featureOccurrencesInCategory.put(entry.getKey(), entry.getValue().values().stream().mapToLong(value -> value).sum());
+        }
+
+        Table<String,String,Double> logLikelihoods = HashBasedTable.create();
+        for (String category : priorLogMap.keySet()) {
+            Map<String, Map<String, Long>> rowMap = selectedLetterCountTable.rowMap();
+            for (Map.Entry<String, Map<String, Long>> entry : rowMap.entrySet()) {
+                String word = entry.getKey();
+                Long count = entry.getValue().get(category) == null ? 0L : entry.getValue().get(category);
+                double logLikelihood = Math.log((count + 1.0) / (featureOccurrencesInCategory.get(category) + bayesModel.getFeatureCount()));
+                logLikelihoods.put(word, category, logLikelihood);
+            }
+        }
+        bayesModel.setLogLikelihoods(logLikelihoods);
         return bayesModel;
     }
 
 
-    public void chi_square(AtomicLongMap<String> categoryCountMap, Table<String,String,Long> letterCountTable) {
+    public Map<String, Double> chi_square(AtomicLongMap<String> categoryCountMap, Table<String,String,Long> letterCountTable) {
+        Map<String, Double> selectedFeatures = new HashMap<>();
         Map<String, Map<String, Long>> letterCountTableRowMap = letterCountTable.rowMap();
-        String[] categoryArray = categoryCountMap.asMap().keySet().toArray(new String[categoryCountMap.size()]);
         Long totalDocCount = categoryCountMap.asMap().values().stream().reduce(0L, Long::sum);
-        Integer cou = 0 ;
         if (!CollectionUtils.isEmpty(letterCountTableRowMap)) {
             for (Map.Entry<String, Map<String, Long>> entry : letterCountTableRowMap.entrySet()) {
                 String word = entry.getKey();
@@ -76,19 +116,15 @@ public class BayesClassifier {
                     double l1 = Math.pow(N11 * N00 - N10 * N01, 2);
                     long l3 = (N1dot + N0dot);
                     double chisquareScore = l3 * l1 / l;
-                    if(N11 == 44 && N10 == 38) {
-                        double chisquareScore1 = (N1dot + N0dot) * Math.pow(N11 * N00 - N10 * N01, 2) / l;
-                        System.out.println(letterCountTableRowMap.size() + "  " + word + "  " + category + "  " + chisquareScore + "  " + N1dot + " " + N0dot + " " + N11 + " " + N01 + " " + N00 + " " + N10);
-                    }
 
                     if (chisquareScore > 10.83) {
-                        System.out.println(word + "  " + category + "  " + chisquareScore);
-                        cou++;
+                        selectedFeatures.put(word, chisquareScore);
+                        break;
                     }
                 }
             }
         }
-        System.out.println("cou:" + cou);
+        return selectedFeatures;
     }
 
     public BayesModel getBayesModel() {
