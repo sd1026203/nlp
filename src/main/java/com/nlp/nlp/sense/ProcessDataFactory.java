@@ -54,7 +54,8 @@ public class ProcessDataFactory {
                 String fileContent = readWholeFile(file);
                 DocModel docModel = new DocModel();
                 docModel.setCategory(categoryName);
-                AtomicLongMap<String> letterCountMap = AtomicLongMap.create();
+//                AtomicLongMap<String> letterCountMap = AtomicLongMap.create();
+                Set<String> letterSet = new HashSet<>();
 
 
 //                List<Word> words = WordSegmenter.seg(fileContent);
@@ -70,13 +71,13 @@ public class ProcessDataFactory {
                 if(words != null && words.length > 0) {
                     for(String word : words) {
 //                        String wordStr = term.word;
-                        letterCountMap.put(word, 1);
+                        letterSet.add(word);
                     }
                 }
 
 
 
-                docModel.setLetterCountMap(letterCountMap);
+                docModel.setLetterSet(letterSet);
                 docModels.add(docModel);
                 categoryDocCountMap.incrementAndGet(categoryName);
             }

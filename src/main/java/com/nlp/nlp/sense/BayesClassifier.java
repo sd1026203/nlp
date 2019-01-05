@@ -23,16 +23,16 @@ public class BayesClassifier {
         if (!CollectionUtils.isEmpty(docModelList)) {
             for (DocModel docModel : docModelList) {
                 String category = docModel.getCategory();
-                AtomicLongMap<String> letterCountMap =  docModel.getLetterCountMap();
-                if(letterCountMap != null && letterCountMap.size() > 0) {
-                    for (Map.Entry<String, Long> letterCountEntrySet : letterCountMap.asMap().entrySet()) {
-                        String word = letterCountEntrySet.getKey();
-                        Long wordCount = letterCountEntrySet.getValue();
-                        Long totalCount = letterCountTable.get(word, category);
+                Set<String> letterSet =  docModel.getLetterSet();
+                if(!CollectionUtils.isEmpty(letterSet)) {
+                    for (String letter : letterSet) {
+//                        String word = letterCountEntrySet.getKey();
+//                        Long wordCount = letterCountEntrySet.getValue();
+                        Long totalCount = letterCountTable.get(letter, category);
                         if (totalCount == null) {
-                            letterCountTable.put(word, category, wordCount);
+                            letterCountTable.put(letter, category, 1L);
                         } else {
-                            letterCountTable.put(word, category, wordCount + totalCount);
+                            letterCountTable.put(letter, category, 1L + totalCount);
                         }
                     }
                 }
