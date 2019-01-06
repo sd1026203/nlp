@@ -23,6 +23,7 @@ import java.util.*;
  */
 public class ProcessDataFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDataFactory.class);
+    public static final HanLPTokenizer hanLPTokenizer = new HanLPTokenizer();
     public static PreprocessedDataSet loadPreprocessedDataSet(String folderPath) throws IOException {
         if (folderPath == null) throw new IllegalArgumentException("参数 folderPath == null");
         File root = new File(folderPath);
@@ -38,7 +39,7 @@ public class ProcessDataFactory {
         PreprocessedDataSet preprocessedDataSet = new PreprocessedDataSet();
         List<DocModel> docModels = new ArrayList<>();
         AtomicLongMap<String> categoryDocCountMap = AtomicLongMap.create();
-        HanLPTokenizer hanLPTokenizer = new HanLPTokenizer();
+
         for (File folder : folders) {
             if (folder.isFile()) continue;
             File[] files = folder.listFiles();
@@ -48,36 +49,9 @@ public class ProcessDataFactory {
             String categoryName = folder.getName();
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
-                if(file.getName().equals("neg.1674.txt")){
-                    System.out.println(readWholeFile(file));
-                }
                 String fileContent = readWholeFile(file);
-                DocModel docModel = new DocModel();
-                docModel.setCategory(categoryName);
-//                AtomicLongMap<String> letterCountMap = AtomicLongMap.create();
-                Set<String> letterSet = new HashSet<>();
 
-
-//                List<Word> words = WordSegmenter.seg(fileContent);
-//                if(!CollectionUtils.isEmpty(words)) {
-//                    for(Word word : words) {
-//                        String wordStr = word.getText();
-//                        letterCountMap.put(wordStr, 1);
-//                    }
-//                }
-
-
-                String[] words = hanLPTokenizer.segment(fileContent);
-                if(words != null && words.length > 0) {
-                    for(String word : words) {
-//                        String wordStr = term.word;
-                        letterSet.add(word);
-                    }
-                }
-
-
-
-                docModel.setLetterSet(letterSet);
+                DocModel docModel = new DocModel(categoryName, fileContent);
                 docModels.add(docModel);
                 categoryDocCountMap.incrementAndGet(categoryName);
             }
@@ -86,6 +60,7 @@ public class ProcessDataFactory {
         preprocessedDataSet.setDocModels(docModels);
         return preprocessedDataSet;
     }
+
 
     public static String readWholeFile(File file) throws IOException {
         Long filelength = file.length();     //获取文件长度
