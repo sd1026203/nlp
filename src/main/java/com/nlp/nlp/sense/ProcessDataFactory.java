@@ -28,9 +28,7 @@ public class ProcessDataFactory {
         if (folderPath == null) throw new IllegalArgumentException("参数 folderPath == null");
         File root = new File(folderPath);
         if (!root.exists()) throw new IllegalArgumentException(String.format("目录 %s 不存在", root.getAbsolutePath()));
-        if (!root.isDirectory())
-            throw new IllegalArgumentException(String.format("目录 %s 不是一个目录", root.getAbsolutePath()));
-//
+        if (!root.isDirectory()) throw new IllegalArgumentException(String.format("目录 %s 不是一个目录", root.getAbsolutePath()));
         File[] folders = root.listFiles();
         if (folders == null) {
             LOGGER.info("空集");
@@ -43,14 +41,11 @@ public class ProcessDataFactory {
         for (File folder : folders) {
             if (folder.isFile()) continue;
             File[] files = folder.listFiles();
-            if (files == null) {
-                continue;
-            }
+            if (files == null) continue;
             String categoryName = folder.getName();
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
                 String fileContent = readWholeFile(file);
-
                 DocModel docModel = new DocModel(categoryName, fileContent);
                 docModels.add(docModel);
                 categoryDocCountMap.incrementAndGet(categoryName);

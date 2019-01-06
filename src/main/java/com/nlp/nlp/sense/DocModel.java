@@ -28,21 +28,21 @@ public class DocModel {
     public DocModel(String categoryName, String fileContent) {
         Set<String> letterSet = new HashSet<>();
         AtomicLongMap<String> letterCountMap = AtomicLongMap.create();
-//        List<Word> words = WordSegmenter.seg(fileContent);
-//        if(!CollectionUtils.isEmpty(words)) {
-//            for(Word word : words) {
-//                letterSet.add(word.getText());
-//                letterCountMap.incrementAndGet(word.getText());
-//            }
-//        }
-        String[] words = ProcessDataFactory.hanLPTokenizer.segment(fileContent);
-        if(words != null && words.length > 0) {
-            for(String word : words) {
-                letterSet.add(word);
-                letterCountMap.incrementAndGet(word);
-
+        List<Word> words = WordSegmenter.seg(fileContent);
+        if(!CollectionUtils.isEmpty(words)) {
+            for(Word word : words) {
+                letterSet.add(word.getText());
+                letterCountMap.incrementAndGet(word.getText());
             }
         }
+//        String[] words = ProcessDataFactory.hanLPTokenizer.segment(fileContent);
+//        if(words != null && words.length > 0) {
+//            for(String word : words) {
+//                letterSet.add(word);
+//                letterCountMap.incrementAndGet(word);
+//
+//            }
+//        }
         this.category = categoryName;
         this.letterSet = letterSet;
         this.letterCountMap = letterCountMap;
