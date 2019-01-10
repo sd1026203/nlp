@@ -1,21 +1,15 @@
 package com.nlp.nlp.sense;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
 import com.google.common.util.concurrent.AtomicLongMap;
-import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.classification.tokenizers.HanLPTokenizer;
-import com.hankcs.hanlp.seg.common.Term;
-import org.apdplat.word.WordSegmenter;
-import org.apdplat.word.segmentation.Word;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author 葛伟 gewei01@58ganji.com
