@@ -51,7 +51,7 @@ public class DocModel {
     //所属类别
     private String category;
 
-    //词频, 去重, value永远是1
+    //词频, 去重
     private Set<String> letterSet;
     //词频, 不去重, value大于等于1
     private AtomicLongMap<String> letterCountMap;

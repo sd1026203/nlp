@@ -24,10 +24,8 @@ public class ProcessDataFactory {
         if (!root.exists()) throw new IllegalArgumentException(String.format("目录 %s 不存在", root.getAbsolutePath()));
         if (!root.isDirectory()) throw new IllegalArgumentException(String.format("目录 %s 不是一个目录", root.getAbsolutePath()));
         File[] folders = root.listFiles();
-        if (folders == null) {
-            LOGGER.info("空集");
-            return null;
-        }
+        if (folders == null) return null;
+
         PreprocessedDataSet preprocessedDataSet = new PreprocessedDataSet();
         List<DocModel> docModels = new ArrayList<>();
         AtomicLongMap<String> categoryDocCountMap = AtomicLongMap.create();
